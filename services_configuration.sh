@@ -1,10 +1,11 @@
+
 #!/bin/bash
 
 source services_audit.sh
 
 sync_config () {
 
-    if echo $output | grep -q "chrony" ; then
+    if echo $output | grep -q "chrony"; then
 
         sudo apt install chrony
 
@@ -28,9 +29,9 @@ sync_config () {
 
         reload_chrony_config() {
             if systemctl is-active --quiet chronyd; then
-                systemctl restart chronyd
+                sudo systemctl restart chronyd
             else
-                chronyc reload sources
+                sudo chronyc reload sources
             fi
         }
 
@@ -52,7 +53,7 @@ sync_config () {
 
         reload_chrony_config
 
-        echo "\nChrony configuration completed.\n"
+        echo -e "\nChrony configuration completed.\n"
 
         chrony_conf="/etc/chrony/chrony.conf"
     
@@ -86,15 +87,17 @@ sync_config () {
             
             done
 
-        echo "\nChrony user has been configured.\n"
+        fi
+
+        echo -e "\nChrony user has been configured.\n"
 
         sudo systemctl unmask chrony.service
 
         sudo systemctl --now enable chrony.service
 
-        echo "\nChrony has been unmasked and started.\n"
+        echo -e "\nChrony has been unmasked and started.\n"
 
-    elif echo $output | grep -q "systemd-timesyncd" ; then
+    elif echo $output | grep -q "systemd-timesyncd"; then
 
         NTP="time.nist.gov"
         Fallback_NTP="time-a-g.nist.gov time-b-g.nist.gov time-c-g.nist.gov"
@@ -120,14 +123,14 @@ sync_config () {
 
         sudo systemctl try-reload-or-restart systemd-timesyncd
 
-        echo "\nLines "$NTP" and "$FALLBACK_NTP" added to the systemd-timesyncd configuration file.\n"
+        echo -e "\nLines "$NTP" and "$FALLBACK_NTP" added to the systemd-timesyncd configuration file.\n"
 
         sudo systemctl unmask systemd-timesyncd.service
         sudo systemctl --now enable systemd-timesyncd.service
 
-        echo "\nsystemctl is unmasked and enabled\n"
+        echo -e "\nsystemctl is unmasked and enabled\n"
 
-    elif echo $output | grep -q "ntp" ; then
+    elif echo $output | grep -q "ntp"; then
 
         sudo apt install ntp
 
@@ -154,7 +157,7 @@ sync_config () {
         
         fi
 
-        echo "\nntp configuration file was updated with the restrict lines\n"
+        echo -e "\nntp configuration file was updated with the restrict lines\n"
 
         edit_ntp_config() {
             local config_file="/etc/ntp.conf"
@@ -171,7 +174,7 @@ sync_config () {
 
         sudo systemctl restart ntp
 
-        echo "\nntp configuration file updated with server and pool lines\n"
+        echo -e "\nntp configuration file updated with server and pool lines\n"
 
         ntp_conf_file="/etc/init.d/ntp"
         ntp_user="RUNASUSER=ntp"
@@ -187,20 +190,21 @@ sync_config () {
 
         sudo systemctl restart ntp.service
 
-        echo "\nntp user was updated in the ntp configuration file\n"
+        echo -e "\nntp user was updated in the ntp configuration file\n"
 
         sudo systemctl unmask ntp.service
 
         sudo systemctl --now enable ntp.service
 
-        echo "\nntp services was unmasked and enabled\n"
+        echo -e "\nntp services was unmasked and enabled\n"
 
     else
         
-        echo "\nNo time synchronization service was found on the system\n"
+        echo -e "\nNo configuration changes were made to the time synchronization service\n"
+
+    fi
         
 }
-
 
 X_windows_system_config () {
 
@@ -208,7 +212,7 @@ X_windows_system_config () {
         echo -e "\nNo X Window System packages to remove as it is not installed\n"
     
     else
-        apt purge xserver-xorg*
+        sudo apt purge xserver-xorg*
 
         echo "X Windows System packages were successfully removed"
     fi
@@ -217,7 +221,7 @@ X_windows_system_config () {
 
 avahi_server_config () {
 
-    if echo $avahi_output | grep -q "not"; then
+    if [[ -z $avahi_output ]];  then
         echo -e "\nNothing was removed, avahi-daemon not installed\n"
 
     else
@@ -233,11 +237,11 @@ avahi_server_config () {
 
 cups_config () {
 
-    if echo $cups_output | grep -q "not"; then
+    if [[ -z $cups_output ]]; then
         echo "\nNothing was removed, cups not installed\n"
 
     else
-        apt purge cups
+        sudo apt purge cups
 
         echo -e "\ncups was successfully removed\n"
 
@@ -246,11 +250,11 @@ cups_config () {
 
 DHCP_config () {
 
-     if echo $dhcp_output | grep -q "not"; then
+     if [[ -z $dhcp_output ]]; then
         echo "\nNothing was removed, DHCP server not installed\n"
 
     else
-        apt purge isc-dhcp-server
+        sudo apt purge isc-dhcp-server
 
         echo -e "\nDHCP server was successfully removed\n"
 
@@ -259,11 +263,11 @@ DHCP_config () {
 
 LDAP_config () {
 
-    if echo $LDAP_server_output | grep -q "not"; then
+    if [[ -z $LDAP_server_output ]]; then
         echo -e "\nNothing was removed, LDAP server not installed\n"
 
     else
-        apt purge slapd
+        sudo apt purge slapd
 
         echo -e "\nLDAP server was successfully removed\n"
 
@@ -272,11 +276,11 @@ LDAP_config () {
 
 NFS_config () {
 
-    if echo $NFS_output | grep -q "not"; then
+    if [[ -z $NFS_output ]]; then
         echo -e "\nNothing was removed, NFS is not installed\n"
 
     else
-        apt purge nfs-kernel-server
+        sudo apt purge nfs-kernel-server
 
         echo -e "\nNFS was successfully removed\n"
 
@@ -285,11 +289,11 @@ NFS_config () {
 
 DNS_config () {
 
-    if echo $DNS_output | grep -q "not"; then
+    if [[ -z $DNS_output ]]; then
         echo -e "\nNothing was removed, DNS server is not installed\n"
 
     else
-        apt purge bind9
+        sudo apt purge bind9
 
         echo -e "\nDNS server was successfully removed\n"
 
@@ -298,11 +302,11 @@ DNS_config () {
 
 FTP_config () {
 
-    if echo $FTP_output | grep -q "not"; then
+    if [[ -z $FTP_output ]]; then
         echo -e "\nNothing was removed, FTP server is not installed\n"
 
     else
-        apt purge vsftpd
+        sudo apt purge vsftpd
 
         echo -e "\nFTP server was successfully removed\n"
 
@@ -312,11 +316,11 @@ FTP_config () {
 
 HTTP_config () {
 
-    if echo $HTTP_server | grep -q "not"; then
+    if [[ -z $HTTP_output ]]; then
         echo -e "\nNothing was removed, HTTP server is not installed\n"
 
     else
-        apt purge apache2
+        sudo apt purge apache2
 
         echo -e "\nHTTP server was successfully removed\n"
 
@@ -325,11 +329,11 @@ HTTP_config () {
 
 IMAP_and_POP3_config () {
 
-    if echo $IMAP_output | grep -q "not"; then
+    if [[ -z $IMAP_output ]]; then
         echo -e "\nNothing was removed, IMAP and POP3 server are not installed\n"
 
     else
-        apt purge dovecot-imapd dovecot-pop3d
+        sudo apt purge dovecot-imapd dovecot-pop3d
 
         echo -e "\nIMAP and POP3 server was successfully removed\n"
 
@@ -339,11 +343,11 @@ IMAP_and_POP3_config () {
 
 SAMBA_config () {
 
-    if echo $samba_output | grep -q "not"; then
+    if [[ -z $samba_output ]]; then
         echo -e "\nNothing was removed, Samba is not installed\n"
 
     else
-        apt purge samba
+        sudo apt purge samba
 
         echo -e "\nSamba was successfully removed\n"
 
@@ -352,11 +356,11 @@ SAMBA_config () {
 
 HTTP_proxy_server_config () {
 
-    if echo $HTTP_proxy_output | grep -q "not"; then
+    if [[ -z $HTTP_proxy_output ]]; then
         echo -e "\nNothing was removed, HTTP Proxy Server is not installed\n"
 
     else
-        apt purge squid
+        sudo apt purge squid
 
         echo -e "\nHTTP Proxy Server was successfully removed\n"
 
@@ -365,11 +369,11 @@ HTTP_proxy_server_config () {
 
 SNMP_config () {
 
-    if echo $SNMP_output | grep -q "not"; then
+    if [[ -z $SNMP_output ]]; then
         echo -e "\nNothing was removed, SNMP Server is not installed\n"
 
     else
-        apt purge snmp
+        sudo apt purge snmp
 
         echo -e "\nSNMP Server was successfully removed\n"
 
@@ -378,11 +382,11 @@ SNMP_config () {
 
 NIS_server_config () {
 
-    if echo $NIS_output | grep -q "not"; then
+    if [[ -z $NIS_output ]]; then
         echo -e "\nNothing was removed, NIS Server is not installed\n"
 
     else
-        apt purge nis
+        sudo apt purge nis
 
         echo -e "\nNIS Server was successfully removed\n"
 
@@ -402,7 +406,7 @@ mail_trasfer_agent_config () {
         echo $line >> $file
     fi
 
-    systemctl restart postfix
+    sudo systemctl restart postfix
 
     echo -e "\nLine added to the receiving mail section in $file\n"
 
@@ -410,16 +414,16 @@ mail_trasfer_agent_config () {
 
 rsync_service_config () {
 
-    if echo $rsync_output | grep -q "not"; then
+    if [[ -z $rsync_output ]]; then
         echo -e "\nNothing was removed, rsync service is either not installed or masked\n"
 
     else
 
-        apt purge rsync
+        sudo apt purge rsync
         
-        systemctl stop rsync
+        sudo systemctl stop rsync
 
-        systemctl mask rsync
+        sudo systemctl mask rsync
 
         echo -e "\nrsync service removed\n"
 
@@ -428,11 +432,11 @@ rsync_service_config () {
 
 NIS_client_config () {
 
-    if echo $NIS_client_output | grep -q "not"; then
+    if [[ -z $NIS_client_output ]]; then
         echo -e "\nNothing was removed, NIS Client is not installed\n"
 
     else
-        apt purge nis
+        sudo apt purge nis
 
         echo -e "\nNIS Client was successfully removed\n"
 
@@ -441,11 +445,11 @@ NIS_client_config () {
 
 rsh_client_config () {
 
-    if echo $rsh_client_config | grep -q "not"; then
+    if [[ -z $rsh_output ]]; then
         echo -e "\nNothing was removed, rsh client is not installed\n"
 
     else
-        apt purge rsh-client
+        sudo apt purge rsh-client
 
         echo -e "\nrsh client was successfully removed\n"
 
@@ -454,11 +458,11 @@ rsh_client_config () {
 
 talk_client_config () {
 
-    if echo $talk_output | grep -q "not"; then
+    if [[ -z $talk_output ]]; then
         echo -e "\nNothing was removed, talk client is not installed\n"
 
     else
-        apt purge talk
+        sudo apt purge talk
 
         echo -e "\ntalk client was successfully removed\n"
 
@@ -467,11 +471,11 @@ talk_client_config () {
 
 telnet_client_config () {
 
-    if echo $telnet_output | grep -q "not"; then
+    if [[ -z $telnet_output ]]; then
         echo -e "\nNothing was removed, telnet client is not installed\n"
 
     else
-        apt purge telnet
+        sudo apt purge telnet
 
         echo -e "\ntelnet client was successfully removed\n"
 
@@ -480,24 +484,24 @@ telnet_client_config () {
 
 LDAP_client_config () {
 
-    if echo $LDAP_output | grep -q "not"; then
+    if [[ -z $LDAP_output ]]; then
         echo -e "\nNothing was removed, LDAP client is not installed\n"
 
     else
-        apt purge ldap-utils
+        sudo apt purge ldap-utils
 
         echo -e "\nLDAP client was successfully removed\n"
 
     fi
 }
 
-RPC () {
+RPC_config () {
 
-    if echo $RPC_output | grep -q "not"; then
+    if [[ -z $RPC_output ]]; then
         echo -e "\nNothing was removed, RPC is not installed\n"
 
     else
-        apt purge ldap-utils
+        sudo apt purge ldap-utils
 
         echo -e "\nRPC was successfully removed\n"
 
@@ -506,13 +510,13 @@ RPC () {
 
 nonessential_services_config () {
 
-    read -p "\nEnter the name of the package that needs to be removed (if not packages need to be removed, type 'none'):\n " package
+    read -ep "\nEnter the name of the package that needs to be removed (if not packages need to be removed, type 'none'):\n " package
 
     if [ "$package" != "none" ]; then
-        apt purge $package
+        sudo apt purge $package
     else
         read -p "Enter service name to stop and mask: " service
-        systemctl --now mask $service
+        sudo systemctl --now mask $service
 
         if [[ -z $service ]]; then
             echo "\nNo service name was given\n"
@@ -521,6 +525,12 @@ nonessential_services_config () {
         fi
     fi
 }
+
+
+
+
+
+
 
 
 
