@@ -133,21 +133,19 @@ sync () {
 
 }
 
-
 # Function: telnet_client
 
 telnet_client () {
 
-   telnet_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' telnet)   # Checks if telnet client is not installed 
+   telnet_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep telnet )   # Checks if telnet client is not installed 
 
-    if echo $telnet_output | grep -q "not"; then
-        echo -e "\nAudit passed : telnet client is not installed\n"
+    if  [[ -z $telnet_output ]] ; then
+        echo -e "Audit passed : telnet client is not installed\n"
 
     else
-        echo -e "\nAudit failed : telnet client is installed\n"
+        echo -e "Audit failed : telnet client is installed\n"
 
     fi
-
 
 }
 
@@ -157,7 +155,7 @@ FTP_server () {
 
     FTP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep ftp)   # checks if FTP server is not installed
 
-    if echo $FTP_output | grep -q "not"; then
+    if [[ -z $FTP_output ]]; then
         echo -e "\nAudit passed : FTP server is not installed\n"
 
     else
@@ -171,9 +169,9 @@ FTP_server () {
 
 DNS_server () {
 
-    DNS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' bind9)   # checks if DNS server is not installed
+    DNS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep bind9)   # checks if DNS server is not installed
 
-    if echo $DNS_output | grep -q "not"; then
+    if [[ -z $DNS_output ]]; then
         echo -e "\nAudit passed : DNS server is not installed\n"
 
     else
@@ -204,13 +202,13 @@ mail_transfer () {
 
 avahi_server () {
     
-    avahi_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' avahi-daemon)   # checks if avahi server is not installed
+    avahi_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep avahi-daemon)   # checks if avahi server is not installed
 
-    if echo $avahi_output | grep -q "not"; then
-        echo -e "$Green\nAudit passed : Avahi server is not installed$NC\n"
+    if [[ -z $avahi_output ]];  then
+        echo -e "\nAudit passed : Avahi server is not installed\n"
 
     else
-        echo -e "$Red\nAudit failed : Avahi server is installed$NC\n"
+        echo -e "\nAudit failed : Avahi server is installed\n"
 
     fi
 
@@ -220,9 +218,9 @@ avahi_server () {
 
 SNMP () {
 
-    SNMP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' snmp)   # checks if SNMP server is not installed
+    SNMP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep snmp)   # checks if SNMP server is not installed
 
-    if echo $SNMP_output | grep -q "not"; then
+    if [[ -z $SNMP_output ]]; then
         echo -e "\nAudit passed : SNMP server is not installed\n"
 
     else
@@ -238,11 +236,12 @@ HTTP_proxy_server () {
 
     HTTP_proxy_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep -E 'squid|proxy')   # checks if HTTP proxy server is not installed
 
-    if echo $HTTP_proxy_output | grep -q "not"; then
+    
+    if [[ -z $HTTP_proxy_output ]]; then
         echo -e "\nAudit passed : HTTP Proxy server is not installed\n"
 
     else
-        echo -e "\nAudit failed : HTTP Proxy server server is installed\n"
+        echo -e "\nAudit failed : HTTP Proxy server is installed\n"
 
     fi
 
@@ -254,7 +253,7 @@ HTTP_server () {
 
     HTTP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep httpd)   # checks if HTTP server is not installed
 
-    if echo $HTTP_output | grep -q "not"; then
+    if [[ -z $HTTP_output ]]; then
         echo -e "\nAudit passed : HTTP server is not installed\n"
 
     else
@@ -268,9 +267,9 @@ HTTP_server () {
 
 rsync_service_installed () {
 
-    rsync_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rsync)   # Verifies if rsync is installed
+    rsync_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep rsync)   # Verifies if rsync is installed
 
-    if echo "$rsync_output" | grep -q "not" ; then
+    if [[ -z $rsync_output ]]; then
         echo -e "\nAudit passed : rsync service is not installed\n"
 
     else
@@ -305,9 +304,9 @@ rsync_service_masked () {   # Verifies if rsync is masked
 
 NFS () {
      
-     NFS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nfs-kernel-server)   # ensures if NFS is not installed
+     NFS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep nfs-kernel-server)   # ensures if NFS is not installed
 
-     if echo $NFS_output | grep -q "not"; then
+     if [[ -z $NFS_output ]]; then
         echo -e "\nAudit passed : NFS is not installed\n"
 
     else
@@ -329,9 +328,9 @@ nonessential_services () {
 
 NIS () {
 
-    NIS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis)   # checks if NIS server is not installed
+    NIS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep nis)   # checks if NIS server is not installed
 
-    if echo $NIS_output | grep -q "not"; then
+    if [[ -z $NIS_output ]]; then
         echo -e "\nAudit passed : NIS server is not installed\n"
 
     else
@@ -345,9 +344,9 @@ NIS () {
 
 NIS_client () {
 
-    NIS_client_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis)   # Checks if NIS Client is not installed 
+    NIS_client_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep nis)   # Checks if NIS Client is not installed 
 
-    if echo $NIS_client_output | grep -q "not"; then
+    if [[ -z $NIS_client_output ]]; then
         echo -e "\nAudit passed : NIS client is not installed\n"
 
     else
@@ -361,9 +360,9 @@ NIS_client () {
 
 dhcp_server () {
     
-    dhcp_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' isc-dhcp-server)   # checks if DHCP server is not installed
+    dhcp_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep isc-dhcp-server)   # checks if DHCP server is not installed
 
-    if echo $dhcp_output | grep -q "not"; then
+    if [[ -z $dhcp_output ]]; then
         echo -e "\nAudit passed : DHCP server is not installed\n"
 
     else
@@ -377,9 +376,9 @@ dhcp_server () {
 
 LDAP_server () {
     
-    LDAP_server_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' slapd)   # checks if LDAP server is not installed
+    LDAP_server_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep slapd)   # checks if LDAP server is not installed
 
-    if echo $LDAP_server_output | grep -q "not"; then
+    if [[ -z $LDAP_server_output ]]; then
         echo -e "\nAudit passed : LDAP server is not installed\n"
 
     else
@@ -393,9 +392,9 @@ LDAP_server () {
 
 IMAP_and_POP3 () {
 
-    IMAP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' dovecot-imapd dovecot-pop3d courier-imap cyrus-imap)   # Checks if IMAP and POP3 servers are not installed
+    IMAP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep dovecot-imapd dovecot-pop3d courier-imap cyrus-imap 2>/dev/null)   # Checks if IMAP and POP3 servers are not installed
 
-    if echo $IMAP_output | grep -q "not"; then
+    if [[ -z $IMAP_output ]]; then
         echo -e "\nAudit passed : IMAP and POP3 server is not installed\n"
 
     else
@@ -408,9 +407,9 @@ IMAP_and_POP3 () {
 
 samba () {
 
-    samba_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' samba)   # checks if samba is not installed
+    samba_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep samba)   # checks if samba is not installed
 
-    if echo $samba_output | grep -q "not"; then
+    if [[ -z $samba_output ]]; then
         echo -e "\nAudit passed : Samba is not installed\n"
 
     else
@@ -424,9 +423,9 @@ samba () {
 
 RPC () {
 
-    RPC_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rpcbind)   # Checks if RPC is not installed 
+    RPC_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep rpcbind)   # Checks if RPC is not installed 
 
-    if echo $RPC_output | grep -q "not"; then
+    if [[ -z $RPC_output ]]; then
         echo -e "\nAudit passed : RPC is not installed\n"
 
     else
@@ -440,9 +439,9 @@ RPC () {
 
 rsh_client () {
 
-    rsh_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rsh-client)   # Checks if rsh client is not installed
+    rsh_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep rsh-client)   # Checks if rsh client is not installed
 
-    if echo $rsh_output | grep -q "not"; then
+    if [[ -z $rsh_output ]]; then
         echo -e "\nAudit passed : rsh client is not installed\n"
 
     else
@@ -456,9 +455,9 @@ rsh_client () {
 
 LDAP_client () {
 
-    LDAP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' ldap-utils)   # Checks if LDAP client is not installed 
+    LDAP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep ldap-utils)   # Checks if LDAP client is not installed 
 
-    if echo $LDAP_output | grep -q "not"; then
+    if [[ -z $LDAP_output ]]; then
         echo -e "\nAudit passed : LDAP client is not installed\n"
 
     else
@@ -472,9 +471,9 @@ LDAP_client () {
 
 cups () {
     
-    cups_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' cups)   # checks if cups is not installed
+    cups_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep cups)   # checks if cups is not installed
 
-    if echo $cups_output | grep -q "not"; then
+    if [[ -z $cups_output ]]; then
         echo -e "\nAudit passed : CUPS is not installed\n"
 
     else
@@ -488,9 +487,9 @@ cups () {
 
 talk_client () {
 
-    talk_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' talk)   # Checks if talk client is not installed
+    talk_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep talk)   # Checks if talk client is not installed
 
-     if echo $talk_output | grep -q "not"; then
+     if [[ -z $talk_output ]]; then
         echo -e "\nAudit passed : talk client is not installed\n"
 
     else
