@@ -133,68 +133,17 @@ sync () {
 
 }
 
-# Function: telnet_client
+# Function: x_window_system
 
-telnet_client () {
+x_window_system () {
+    
+    window_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' xserver-xorg* | grep -Pi '\h+installed\b')   # checks if X window system is installed
 
-   telnet_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep telnet )   # Checks if telnet client is not installed 
-
-    if  [[ -z $telnet_output ]] ; then
-        echo -e "Audit passed : telnet client is not installed\n"
-
+    if [[ -z $windows_output ]] ; then
+        echo -e "\nAudit passed : X Window System is not installed\n"
     else
-        echo -e "Audit failed : telnet client is installed\n"
-
+        echo -e "\nAudit failed : X Window System is installed\n"
     fi
-
-}
-
-# Function: FTP_server
-
-FTP_server () {
-
-    FTP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep ftp)   # checks if FTP server is not installed
-
-    if [[ -z $FTP_output ]]; then
-        echo -e "\nAudit passed : FTP server is not installed\n"
-
-    else
-        echo -e "\nAudit failed : FTP server is installed\n"
-
-    fi
-
-}
-
-# Function: DNS_server
-
-DNS_server () {
-
-    DNS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep bind9)   # checks if DNS server is not installed
-
-    if [[ -z $DNS_output ]]; then
-        echo -e "\nAudit passed : DNS server is not installed\n"
-
-    else
-        echo -e "\nAudit failed : DNS server is installed\n"
-
-    fi
-
-}
-
-# Function: mail_transfer_agent
-
-mail_transfer () {
-
-    mail_transfer_output=$(ss -lntu | grep -E ':25\s' | grep -E -v '\s(127.0.0.1|::1):25\s')   # Checks if mail transfer agent is configured for local-only mode 
-
-    if [ -z $mail_transfer_output ] ; then
-        echo -e "\nAudit passed : Mail transfer agent is configured for local-only mode\n"
-
-    else
-        echo -e "\nAudit failed : Mail transfer agent is not configured for local-only mode\n"
-
-    fi
-
 
 }
 
@@ -214,143 +163,15 @@ avahi_server () {
 
 }
 
-# Function: SNMP
-
-SNMP () {
-
-    SNMP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep snmp)   # checks if SNMP server is not installed
-
-    if [[ -z $SNMP_output ]]; then
-        echo -e "\nAudit passed : SNMP server is not installed\n"
-
-    else
-        echo -e "\nAudit failed : SNMP server is installed\n"
-
-    fi
-
-}
-
-# Function: HTTP_proxy_server
-
-HTTP_proxy_server () {
-
-    HTTP_proxy_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep -E 'squid|proxy')   # checks if HTTP proxy server is not installed
-
+cups () {
     
-    if [[ -z $HTTP_proxy_output ]]; then
-        echo -e "\nAudit passed : HTTP Proxy server is not installed\n"
+    cups_output= dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' cups  # checks if cups is not installed
+
+    if [[ -z $cups_output ]]; then
+        echo -e "\nAudit passed : CUPS is not installed\n"
 
     else
-        echo -e "\nAudit failed : HTTP Proxy server is installed\n"
-
-    fi
-
-}
-
-# Function: HTTP_server
-
-HTTP_server () {
-
-    HTTP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep httpd)   # checks if HTTP server is not installed
-
-    if [[ -z $HTTP_output ]]; then
-        echo -e "\nAudit passed : HTTP server is not installed\n"
-
-    else
-        echo -e "\nAudit failed : HTTP server is installed\n"
-
-    fi
-
-}
-
-# Function: resync_service
-
-rsync_service_installed () {
-
-    rsync_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep rsync)   # Verifies if rsync is installed
-
-    if [[ -z $rsync_output ]]; then
-        echo -e "\nAudit passed : rsync service is not installed\n"
-
-    else
-        echo -e "\nAudit failed : rsync is installed\n"
-
-    fi
-
-}
-
-rsync_service_inactive () {   # Verifies if rsync is inactive
-
-    rsync_inactive_output=$(systemctl is-active rsync)
-    echo "rsync_service : $rsync_inactive_output"
-}
-
-rsync_service_masked () {   # Verifies if rsync is masked
-
-    rsync_masked_output=$(systemctl is-enabled rsync)
-    echo "rsync_service_masked : $rsync_masked_output"
-
-    if echo "$rsync_inactive_output" | grep -q "inactive" && echo "$rsync_masked_output" | grep -q "masked" ; then
-        echo -e "\nAudit passed : rsync is inactive and masked\n"
-
-    else
-        echo -e "\nAudit failed : rsync is not inactive or not masked\n"
-
-    fi
-
-}
-
-# Function: NFS
-
-NFS () {
-     
-     NFS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep nfs-kernel-server)   # ensures if NFS is not installed
-
-     if [[ -z $NFS_output ]]; then
-        echo -e "\nAudit passed : NFS is not installed\n"
-
-    else
-        echo -e "\nAudit failed : NFS is installed\n"
-
-    fi
-
-}
-
-# Function: nonessential_services
-
-nonessential_services () {
-
-    lsof -i -P -n | grep -v "(ESTABLISHED)"   # Checks if nonessential services are removed or masked
-
-}
-
-# Function: NIS
-
-NIS () {
-
-    NIS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep nis)   # checks if NIS server is not installed
-
-    if [[ -z $NIS_output ]]; then
-        echo -e "\nAudit passed : NIS server is not installed\n"
-
-    else
-        echo -e "\nAudit failed : NIS server is installed\n"
-
-    fi
-
-}
-
-# Function: NIS_client
-
-NIS_client () {
-
-    NIS_client_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep nis)   # Checks if NIS Client is not installed 
-
-    if [[ -z $NIS_client_output ]]; then
-        echo -e "\nAudit passed : NIS client is not installed\n"
-
-    else
-        echo -e "\nAudit failed : NIS client is installed\n"
+        echo -e "\nAudit failed : CUPS is installed\n"
 
     fi
 
@@ -388,6 +209,70 @@ LDAP_server () {
 
 }
 
+# Function: NFS
+
+NFS () {
+     
+     NFS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep nfs-kernel-server)   # ensures if NFS is not installed
+
+     if [[ -z $NFS_output ]]; then
+        echo -e "\nAudit passed : NFS is not installed\n"
+
+    else
+        echo -e "\nAudit failed : NFS is installed\n"
+
+    fi
+
+}
+
+# Function: DNS_server
+
+DNS_server () {
+
+    DNS_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' bind9 2>/dev/null)   # checks if DNS server is not installed
+
+    if [[ -z $DNS_output ]]; then
+        echo -e "\nAudit passed : DNS server is not installed\n"
+
+    else
+        echo -e "\nAudit failed : DNS server is installed\n"
+
+    fi
+
+}
+
+# Function: FTP_server
+
+FTP_server () {
+
+    FTP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' vsftpd 2>/dev/null)   # checks if FTP server is not installed
+
+    if [[ -z $FTP_output ]]; then
+        echo -e "\nAudit passed : FTP server is not installed\n"
+
+    else
+        echo -e "\nAudit failed : FTP server is installed\n"
+
+    fi
+
+}
+
+# Function: HTTP_server
+
+HTTP_server () {
+
+    HTTP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep httpd)   # checks if HTTP server is not installed
+
+    if [[ -z $HTTP_output ]]; then
+        echo -e "\nAudit passed : HTTP server is not installed\n"
+
+    else
+        echo -e "\nAudit failed : HTTP server is installed\n"
+
+    fi
+
+}
+
 # Function: IMAP_and_POP3_server
 
 IMAP_and_POP3 () {
@@ -407,7 +292,7 @@ IMAP_and_POP3 () {
 
 samba () {
 
-    samba_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep samba)   # checks if samba is not installed
+    samba_output= dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' samba   # checks if samba is not installed
 
     if [[ -z $samba_output ]]; then
         echo -e "\nAudit passed : Samba is not installed\n"
@@ -419,17 +304,120 @@ samba () {
 
 }
 
-# Function: RPC
+# Function: HTTP_proxy_server
 
-RPC () {
+HTTP_proxy_server () {
 
-    RPC_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep rpcbind)   # Checks if RPC is not installed 
+    HTTP_proxy_output= dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' 'squid|proxy' 2>/dev/null   # checks if HTTP proxy server is not installed
 
-    if [[ -z $RPC_output ]]; then
-        echo -e "\nAudit passed : RPC is not installed\n"
+    
+    if [[ -z $HTTP_proxy_output ]]; then
+        echo -e "\nAudit passed : HTTP Proxy server is not installed\n"
 
     else
-        echo -e "\nAudit failed : RPC is installed\n"
+        echo -e "\nAudit failed : HTTP Proxy server is installed\n"
+
+    fi
+
+}
+
+# Function: SNMP
+
+SNMP () {
+
+    SNMP_output= dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' snmp 2>/dev/null  # checks if SNMP server is not installed
+
+    if [[ -z $SNMP_output ]]; then
+        echo -e "\nAudit passed : SNMP server is not installed\n"
+
+    else
+        echo -e "\nAudit failed : SNMP server is installed\n"
+
+    fi
+
+}
+
+# Function: NIS
+
+NIS () {
+
+    NIS_output= dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis   # checks if NIS server is not installed
+
+    if [[ -z $NIS_output ]]; then
+        echo -e "\nAudit passed : NIS server is not installed\n"
+
+    else
+        echo -e "\nAudit failed : NIS server is installed\n"
+
+    fi
+
+}
+
+# Function: mail_transfer_agent
+
+mail_transfer () {
+
+    mail_transfer_output=$(ss -lntu | grep -E ':25\s' | grep -E -v '\s(127.0.0.1|::1):25\s')   # Checks if mail transfer agent is configured for local-only mode 
+
+    if [ -z $mail_transfer_output ] ; then
+        echo -e "\nAudit passed : Mail transfer agent is configured for local-only mode\n"
+
+    else
+        echo -e "\nAudit failed : Mail transfer agent is not configured for local-only mode\n"
+
+    fi
+
+
+}
+
+# Function: resync_service
+
+rsync_service_installed () {
+
+    rsync_output= dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' rsync   # Verifies if rsync is installed
+
+    if [[ -z $rsync_output ]]; then
+        echo -e "\nAudit passed : rsync service is not installed\n"
+
+    else
+        echo -e "\nAudit failed : rsync is installed\n"
+
+    fi
+
+}
+
+rsync_service_inactive () {   # Verifies if rsync is inactive
+
+    rsync_inactive_output=$(systemctl is-active rsync)
+    echo "rsync_service : $rsync_inactive_output"
+}
+
+rsync_service_masked () {   # Verifies if rsync is masked
+
+    rsync_masked_output=$(systemctl is-enabled rsync)
+    echo "rsync_service_masked : $rsync_masked_output"
+
+    if echo "$rsync_inactive_output" | grep -q "inactive" && echo "$rsync_masked_output" | grep -q "masked" ; then
+        echo -e "\nAudit passed : rsync is inactive and masked\n"
+
+    else
+        echo -e "\nAudit failed : rsync is not inactive or not masked\n"
+
+    fi
+
+}
+
+# Function: NIS_client
+
+NIS_client () {
+
+    NIS_client_output= dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' nis   # Checks if NIS Client is not installed 
+
+    if [[ -z $NIS_client_output ]]; then
+        echo -e "\nAudit passed : NIS client is not installed\n"
+
+    else
+        echo -e "\nAudit failed : NIS client is installed\n"
 
     fi
 
@@ -446,38 +434,6 @@ rsh_client () {
 
     else
         echo -e "\nAudit failed : rsh client is installed\n"
-
-    fi
-
-}
-
-# Function: LDAP_client
-
-LDAP_client () {
-
-    LDAP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep ldap-utils)   # Checks if LDAP client is not installed 
-
-    if [[ -z $LDAP_output ]]; then
-        echo -e "\nAudit passed : LDAP client is not installed\n"
-
-    else
-        echo -e "\nAudit failed : LDAP client is installed\n"
-
-    fi
-
-}
-
-# Function: cups
-
-cups () {
-    
-    cups_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep cups)   # checks if cups is not installed
-
-    if [[ -z $cups_output ]]; then
-        echo -e "\nAudit passed : CUPS is not installed\n"
-
-    else
-        echo -e "\nAudit failed : CUPS is installed\n"
 
     fi
 
@@ -500,17 +456,59 @@ talk_client () {
 
 }
 
-# Function: x_window_system
+# Function: telnet_client
 
-x_window_system () {
-    
-    window_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' xserver-xorg* | grep -Pi '\h+installed\b')   # checks if X window system is installed
+telnet_client () {
 
-    if [[ -z $windows_output ]] ; then
-        echo -e "\nAudit passed : X Window System is not installed\n"
+   telnet_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep telnet )   # Checks if telnet client is not installed 
+
+    if  [[ -z $telnet_output ]] ; then
+        echo -e "\nAudit passed : telnet client is not installed\n"
+
     else
-        echo -e "\nAudit failed : X Window System is installed\n"
+        echo -e "\nAudit failed : telnet client is installed\n"
+
     fi
+
+}
+
+# Function: LDAP_client
+
+LDAP_client () {
+
+    LDAP_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep ldap-utils)   # Checks if LDAP client is not installed 
+
+    if [[ -z $LDAP_output ]]; then
+        echo -e "\nAudit passed : LDAP client is not installed\n"
+
+    else
+        echo -e "\nAudit failed : LDAP client is installed\n"
+
+    fi
+
+}
+
+# Function: RPC
+
+RPC () {
+
+    RPC_output=$(dpkg-query -W -f='${binary:Package}\t${Status}\t${db:Status-Status}\n' | grep rpcbind)   # Checks if RPC is not installed 
+
+    if [[ -z $RPC_output ]]; then
+        echo -e "\nAudit passed : RPC is not installed\n"
+
+    else
+        echo -e "\nAudit failed : RPC is installed\n"
+
+    fi
+
+}
+
+# Function: nonessential_services
+
+nonessential_services () {
+
+    lsof -i -P -n | grep -v "(ESTABLISHED)"   # Checks if nonessential services are removed or masked
 
 }
 
