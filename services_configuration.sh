@@ -53,7 +53,7 @@ sync_config () {
 
         reload_chrony_config
 
-        echo -e "\nChrony configuration completed.\n"
+        echo -e "\n\nChrony configuration completed.\n"
 
         chrony_conf="/etc/chrony/chrony.conf"
     
@@ -123,7 +123,7 @@ sync_config () {
 
         sudo systemctl try-reload-or-restart systemd-timesyncd
 
-        echo -e "\nLines "$NTP" and "$FALLBACK_NTP" added to the systemd-timesyncd configuration file.\n"
+        echo -e "\n\nLines "$NTP" and "$FALLBACK_NTP" added to the systemd-timesyncd configuration file.\n"
 
         sudo systemctl unmask systemd-timesyncd.service
         sudo systemctl --now enable systemd-timesyncd.service
@@ -157,7 +157,7 @@ sync_config () {
         
         fi
 
-        echo -e "\nntp configuration file was updated with the restrict lines\n"
+        echo -e "\n\nntp configuration file was updated with the restrict lines\n"
 
         edit_ntp_config() {
             local config_file="/etc/ntp.conf"
@@ -200,7 +200,7 @@ sync_config () {
 
     else
         
-        echo -e "\nNo configuration changes were made to the time synchronization service\n"
+        echo -e "\n\nNo configuration changes were made to the time synchronization service\n"
 
     fi
         
@@ -238,7 +238,7 @@ avahi_server_config () {
 cups_config () {
 
     if [[ -z $cups_output ]]; then
-        echo "\nNothing was removed, cups not installed\n"
+        echo -e "\nNothing was removed, cups not installed\n"
 
     else
         sudo apt purge cups
@@ -251,7 +251,7 @@ cups_config () {
 DHCP_config () {
 
      if [[ -z $dhcp_output ]]; then
-        echo "\nNothing was removed, DHCP server not installed\n"
+        echo -e "\nNothing was removed, DHCP server not installed\n"
 
     else
         sudo apt purge isc-dhcp-server
@@ -397,18 +397,29 @@ mail_trasfer_agent_config () {
 
     local file="/etc/postfix/main.cf"
     local line="inet_interfaces = loopback-only"
+
+    if [ -f $file ]; then
     
-    if grep -q "^inet_interfaces" "$file"; then
+        if grep -q "^inet_interfaces" "$file"; then
+            
+            sudo sed -i "s/^inet_interfaces.*/$line/" "$file"
+
+            sudo systemctl restart postfix
+
+            echo -e "\nLine added to the receiving mail section in $file\n"
+        else
+            
+            echo $line >> $file
+
+            sudo systemctl restart postfix
+
+            echo -e "\nLine added to the receiving mail section in $file\n"
         
-        sudo sed -i "s/^inet_interfaces.*/$line/" "$file"
+        fi
     else
-        
-        echo $line >> $file
+        echo -e "\nNo file was found matching $file\n"
+
     fi
-
-    sudo systemctl restart postfix
-
-    echo -e "\nLine added to the receiving mail section in $file\n"
 
 }
 
@@ -510,30 +521,18 @@ RPC_config () {
 
 nonessential_services_config () {
 
-    read -ep "\nEnter the name of the package that needs to be removed (if not packages need to be removed, type 'none'):\n " package
+    read -p "Enter the name of the package that needs to be removed (if no packages need to be removed, type 'none'): " package
 
     if [ "$package" != "none" ]; then
         sudo apt purge $package
     else
-        read -p "Enter service name to stop and mask: " service
-        sudo systemctl --now mask $service
 
-        if [[ -z $service ]]; then
-            echo "\nNo service name was given\n"
+        sudo systemctl --now mask $package
+
+        if [[ -z $package ]]; then
+            echo -e "\nNo service name was given\n"
             exit 1
 
         fi
     fi
 }
-
-
-
-
-
-
-
-
-
-
-
-
