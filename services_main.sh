@@ -1,35 +1,58 @@
 #!/bin/bash
 
 source services_audit.sh
-# source services_configuration.sh
+source services_configuration.sh
 
 #audit functions
 sync
-telnet_client
-FTP_server
-DNS_server
-mail_transfer
+x_window_system
 avahi_server
-SNMP
-HTTP_proxy_server
-HTTP_server
-rsync_service_installed
-rsync_service_inactive
-resync_service_masked
-NFS
-nonessential_services
-NIS
-NIS_client
+cups
 dhcp_server
 LDAP_server
+NFS
+DNS_server
+FTP_server
+HTTP_server
 IMAP_and_POP3
 samba
-RPC
+HTTP_proxy_server
+SNMP
+NIS
+mail_transfer
+rsync_service_installed
+rsync_service_inactive
+rsync_service_masked
+NIS_client
 rsh_client
-LDAP_client
-cups
 talk_client
-x_window_system
-
+telnet_client
+LDAP_client
+RPC
+nonessential_services
 
 #configuration functions
+sync_config
+X_windows_system_config
+avahi_server_config
+cups_config
+DHCP_config
+LDAP_config
+NFS_config
+DNS_config
+FTP_config
+HTTP_config
+IMAP_and_POP3_config
+SAMBA_config
+HTTP_proxy_server_config
+SNMP_config
+NIS_server_config
+mail_trasfer_agent_config
+rsync_service_config
+NIS_client_config
+rsh_client_config
+talk_client_config
+telnet_client_config
+LDAP_client_config
+RPC_config
+nonessential_services_config
