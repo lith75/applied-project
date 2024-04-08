@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 source services_audit.sh
@@ -229,7 +228,7 @@ avahi_server_config () {
         sudo systemctl stop avahi-daemon.socket
         sudo apt purge avahi-daemon
 
-        echo "\navahi-daemon was successfully removed\n"
+        echo -e "\navahi-daemon was successfully removed\n"
 
     fi
 
@@ -536,3 +535,9 @@ nonessential_services_config () {
         fi
     fi
 }
+
+
+
+
+
+
